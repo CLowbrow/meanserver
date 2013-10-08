@@ -19,7 +19,7 @@ func calculateTemp() float64 {
 
 func getTemp(res http.ResponseWriter, req *http.Request) {
 	ip := strings.Split(req.RemoteAddr, ":")[0]
-	if time.Since(lastRequests[ip]).Seconds() > 1.5 {
+	if time.Since(lastRequests[ip]).Seconds() > 2 {
 		fmt.Fprintln(res, calculateTemp())
 	} else {
 		fmt.Fprintln(res, "you lose")
