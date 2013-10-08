@@ -45,7 +45,7 @@ func getWeather() Weather {
 
 func generateRes(res http.ResponseWriter) {
 	// Randomly give back a good response or random garbage :)
-	dice := rand.Intn(8)
+	dice := rand.Intn(10)
 
 	switch dice {
 	default:
@@ -61,6 +61,9 @@ func generateRes(res http.ResponseWriter) {
 	case 3:
 		res.Header().Set("Content-Type", "application/json")
 		fmt.Fprintln(res, "{\"Server Tired\": \"ZzZzZzZzZzZzZzZzZ\" }")
+	case 4:
+		res.Header().Set("Content-Type", "application/json")
+		fmt.Fprintln(res, "{\"Temperature\": \"<script>window.location = 'http://www.google.com'</script>\", \"Conditions\":\"cloudy\" }")
 	}
 
 }
@@ -73,7 +76,7 @@ func getTemp(res http.ResponseWriter, req *http.Request) {
 	lastRequests.RLock()
 	lr, ok := lastRequests.m[ip]
 	lastRequests.RUnlock()
-	if !ok || time.Since(lr).Seconds() > 1 {
+	if !ok || time.Since(lr).Seconds() > 0 {
 		lastRequests.Lock()
 		lastRequests.m[ip] = time.Now()
 		lastRequests.Unlock()
