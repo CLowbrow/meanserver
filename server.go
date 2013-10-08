@@ -61,6 +61,7 @@ func generateRes(res http.ResponseWriter) {
 }
 
 func getTemp(res http.ResponseWriter, req *http.Request) {
+	//Allows cross-domain requests in modern browsers
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 	ip := getUserIp(req)
 	//Reject if this IP has made a request in the last two seconds
@@ -87,7 +88,6 @@ func main() {
 		port = "5000"
 	}
 
-	//Allows cross-domain requests in modern browsers
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
