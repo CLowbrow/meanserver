@@ -5,7 +5,6 @@ import (
 	"math"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 )
 
@@ -18,13 +17,16 @@ func calculateTemp() float64 {
 }
 
 func getTemp(res http.ResponseWriter, req *http.Request) {
-	ip := strings.Split(req.RemoteAddr, ":")[0]
-	if time.Since(lastRequests[ip]).Seconds() > 2 {
+
+	if _, ok := lastRequests[req.RemoteAddr]; !ok ||
+		time.Since(lastRequests[req.RemoteAddr]).Seconds() > 1 {
+		lastRequests[req.RemoteAddr] = time.Now()
 		fmt.Fprintln(res, calculateTemp())
 	} else {
+		lastRequests[req.RemoteAddr] = time.Now()
 		fmt.Fprintln(res, "you lose")
 	}
-	lastRequests[ip] = time.Now()
+
 }
 
 func main() {
