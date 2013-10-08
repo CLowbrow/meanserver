@@ -17,7 +17,7 @@ func calculateTemp() float64 {
 }
 
 func getTemp(res http.ResponseWriter, req *http.Request) {
-
+	fmt.Fprintln(res, req.RemoteAddr)
 	if _, ok := lastRequests[req.RemoteAddr]; !ok ||
 		time.Since(lastRequests[req.RemoteAddr]).Seconds() > 2 {
 		fmt.Fprintln(res, time.Since(lastRequests[req.RemoteAddr]).Seconds())
