@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -16,7 +17,11 @@ type Weather struct {
 }
 
 var start = time.Now()
-var lastRequests = make(map[string]time.Time)
+var lastRequests = struct {
+	sync.RWMutex
+	m map[string]time.Time
+}{m: make(map[string]time.Time)}
+
 var conditions = [...]string{"cloudy", "sunny", "foggy"}
 
 func getUserIp(req *http.Request) string {
@@ -65,16 +70,22 @@ func getTemp(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 	ip := getUserIp(req)
 	//Reject if this IP has made a request in the last two seconds
-	if _, ok := lastRequests[ip]; !ok ||
-		time.Since(lastRequests[ip]).Seconds() > 2 {
-		lastRequests[ip] = time.Now()
+	lastRequests.RLock()
+	lr, ok := lastRequests.m[ip]
+	lastRequests.RUnlock()
+	if !ok || time.Since(lr).Seconds() > 1 {
+		lastRequests.Lock()
+		lastRequests.m[ip] = time.Now()
+		lastRequests.Unlock()
 		generateRes(res)
 	} else {
-		// Add a 2 second penalty, making the user wait 4 seconds
-		twoSeconds, _ := time.ParseDuration("2s")
-		lastRequests[ip] = time.Now().Add(twoSeconds)
+		// Add a 3 second penalty, making the user wait 4 seconds
+		penalty, _ := time.ParseDuration("3s")
+		lastRequests.Lock()
+		lastRequests.m[ip] = time.Now().Add(penalty)
+		lastRequests.Unlock()
 		res.WriteHeader(429)
-		fmt.Fprintln(res, "Exceede one request every 2 seconds. Now you have to wait 4 seconds!")
+		fmt.Fprintln(res, "Exceede one request every seconds. Now you have to wait 4 seconds!")
 	}
 }
 
