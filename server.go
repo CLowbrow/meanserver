@@ -40,7 +40,7 @@ func getWeather() Weather {
 
 func generateRes(res http.ResponseWriter) {
 	// Randomly give back a good response or random garbage :)
-	dice := rand.Intn(6)
+	dice := rand.Intn(8)
 
 	switch dice {
 	default:
@@ -49,10 +49,13 @@ func generateRes(res http.ResponseWriter) {
 		fmt.Fprintln(res, string(response))
 	case 1:
 		res.Header().Set("Content-Type", "application/json")
-		fmt.Fprintln(res, "{ weather: malformed json here ++_--_(*&^$#$^&*(")
+		fmt.Fprintln(res, "{ weather: ++_--_(*&^$#$^&*(")
 	case 2:
 		res.WriteHeader(http.StatusTeapot)
 		fmt.Fprintln(res, "I'm A Teapot!")
+	case 3:
+		res.Header().Set("Content-Type", "application/json")
+		fmt.Fprintln(res, "{\"Server Tired\": \"ZzZzZzZzZzZzZzZzZ\" }")
 	}
 
 }
@@ -66,9 +69,11 @@ func getTemp(res http.ResponseWriter, req *http.Request) {
 		lastRequests[ip] = time.Now()
 		generateRes(res)
 	} else {
-		lastRequests[ip] = time.Now()
+		// Add a 2 second penalty, making the user wait 4 seconds
+		twoSeconds, _ := time.ParseDuration("2s")
+		lastRequests[ip] = time.Now().Add(twoSeconds)
 		res.WriteHeader(429)
-		fmt.Fprintln(res, "Too many requests")
+		fmt.Fprintln(res, "Exceede one request every 2 seconds. Now you have to wait 4 seconds!")
 	}
 }
 
@@ -81,6 +86,8 @@ func main() {
 	} else {
 		port = "5000"
 	}
+
+	//Allows cross-domain requests in modern browsers
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
