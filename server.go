@@ -34,7 +34,13 @@ func getTemp(res http.ResponseWriter, req *http.Request) {
 func main() {
 	http.HandleFunc("/", getTemp)
 	fmt.Println("listening...")
-	err := http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+	port := ""
+	if os.Getenv("PORT") != "" {
+		port = os.Getenv("PORT")
+	} else {
+		port = "5000"
+	}
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
 	}
