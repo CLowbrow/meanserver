@@ -76,7 +76,7 @@ func getTemp(res http.ResponseWriter, req *http.Request) {
 	lastRequests.RLock()
 	lr, ok := lastRequests.m[ip]
 	lastRequests.RUnlock()
-	if !ok || time.Since(lr).Seconds() > 0 {
+	if !ok || time.Since(lr).Seconds() > 1 {
 		lastRequests.Lock()
 		lastRequests.m[ip] = time.Now()
 		lastRequests.Unlock()
