@@ -7,8 +7,8 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"sync"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -50,7 +50,7 @@ func getWeather() Weather {
 
 func generateRes(res http.ResponseWriter) {
 	// Randomly give back a good response or random garbage :)
-	dice := rand.Intn(11)
+	dice := rand.Intn(10)
 
 	switch dice {
 	default:
@@ -68,19 +68,7 @@ func generateRes(res http.ResponseWriter) {
 		fmt.Fprintln(res, "{\"Server Tired\": \"ZzZzZzZzZzZzZzZzZ\" }")
 	case 4:
 		res.Header().Set("Content-Type", "application/json")
-		fmt.Fprintln(res, "{\"Temperature\": \"<script>window.location = 'http://www.google.com'</script>\", \"Conditions\":\"cloudy\" }")
-	case 5:
-		hj, ok := res.(http.Hijacker)
-		if !ok {
-			http.Error(res, "webserver doesn't support hijacking", http.StatusInternalServerError)
-			return
-		}
-		conn, _, err := hj.Hijack()
-		if err != nil {
-			http.Error(res, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		conn.Close()
+		fmt.Fprintln(res, "{\"Temperature\": \"<script>window.location = 'http://www.google.com'</script>\", \"Conditions\":\"<script>window.location = 'http://www.google.com'</script>\" }")
 	}
 
 }
@@ -94,7 +82,7 @@ func getTemp(res http.ResponseWriter, req *http.Request) {
 	lr, ok := lastRequests.m[ip]
 	lastRequests.RUnlock()
 	maxRate := time.Duration(1)
-	if !ok || time.Since(lr) > maxRate * time.Second {
+	if !ok || time.Since(lr) > maxRate*time.Second {
 		lastRequests.Lock()
 		lastRequests.m[ip] = time.Now()
 		lastRequests.Unlock()
