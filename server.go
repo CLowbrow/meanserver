@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"strings"
 	"time"
 )
 
@@ -28,6 +29,10 @@ func getUserIp(req *http.Request) string {
 	//normalize for running locally or on heroku
 	forwardedIp := req.Header.Get("X-Forwarded-For")
 	if forwardedIp == "" {
+		parts := strings.SplitN(req.RemoteAddr, ":", 2)
+		if len(parts) > 0 {
+			return parts[0]
+		}
 		return req.RemoteAddr
 	} else {
 		return forwardedIp
