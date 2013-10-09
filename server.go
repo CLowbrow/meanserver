@@ -117,6 +117,8 @@ func getTemp(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	rand.Seed(time.Now().Unix())
+
 	http.HandleFunc("/", getTemp)
 	fmt.Println("listening...")
 	port := ""
