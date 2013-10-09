@@ -88,14 +88,14 @@ func getTemp(res http.ResponseWriter, req *http.Request) {
 		lastRequests.Unlock()
 		generateRes(res)
 	} else {
-		// Add a 3 second penalty, making the user wait 3 seconds
+		// Add a 3 second penalty
 		penalty := time.Duration(3)
 		lastRequests.Lock()
 		lastRequests.m[ip] = time.Now().Add(penalty * time.Second)
 		lastRequests.Unlock()
 		if rand.Intn(4) > 1 {
 			res.WriteHeader(429)
-			fmt.Fprintf(res, "Exceeded one request every %d seconds. Now you have to wait %d seconds!\n", maxRate, penalty)
+			fmt.Fprintf(res, "Exceeded one request every %d seconds. Now you have to wait %d seconds!\n", maxRate, penalty+maxRate)
 		} else {
 			// Thanks, Twitter.
 			res.WriteHeader(420)
