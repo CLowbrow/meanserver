@@ -77,7 +77,7 @@ func getTemp(res http.ResponseWriter, req *http.Request) {
 	//Allows cross-domain requests in modern browsers
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 	ip := getUserIp(req)
-	//Reject if this IP has made a request in the last two seconds
+	//Reject if this IP has made a request in the last second
 	lastRequests.RLock()
 	lr, ok := lastRequests.m[ip]
 	lastRequests.RUnlock()
