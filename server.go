@@ -50,7 +50,7 @@ func getWeather() Weather {
 
 func generateRes(res http.ResponseWriter) {
 	// Randomly give back a good response or random garbage :)
-	dice := rand.Intn(10)
+	dice := rand.Intn(11)
 
 	switch dice {
 	default:
@@ -69,6 +69,18 @@ func generateRes(res http.ResponseWriter) {
 	case 4:
 		res.Header().Set("Content-Type", "application/json")
 		fmt.Fprintln(res, "{\"Temperature\": \"<script>window.location = 'http://www.google.com'</script>\", \"Conditions\":\"cloudy\" }")
+	case 5:
+		hj, ok := res.(http.Hijacker)
+		if !ok {
+			http.Error(res, "webserver doesn't support hijacking", http.StatusInternalServerError)
+			return
+		}
+		conn, _, err := hj.Hijack()
+		if err != nil {
+			http.Error(res, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		conn.Close()
 	}
 
 }
