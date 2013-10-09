@@ -93,7 +93,8 @@ func getTemp(res http.ResponseWriter, req *http.Request) {
 	lastRequests.RLock()
 	lr, ok := lastRequests.m[ip]
 	lastRequests.RUnlock()
-	if !ok || time.Since(lr).Seconds() > 1 {
+	maxRate := time.Duration(1)
+	if !ok || time.Since(lr) > maxRate * time.Second {
 		lastRequests.Lock()
 		lastRequests.m[ip] = time.Now()
 		lastRequests.Unlock()
@@ -105,7 +106,7 @@ func getTemp(res http.ResponseWriter, req *http.Request) {
 		lastRequests.m[ip] = time.Now().Add(penalty * time.Second)
 		lastRequests.Unlock()
 		res.WriteHeader(429)
-		fmt.Fprintf(res, "Exceeded one request every %d seconds. Now you have to wait %d seconds!\n", penalty, penalty)
+		fmt.Fprintf(res, "Exceeded one request every %d seconds. Now you have to wait %d seconds!\n", maxRate, penalty)
 	}
 }
 
