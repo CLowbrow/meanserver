@@ -69,6 +69,11 @@ func generateRes(res http.ResponseWriter) {
 	case 4:
 		res.Header().Set("Content-Type", "application/json")
 		fmt.Fprintln(res, "{\"Temperature\": \"<script>window.location = 'http://www.google.com'</script>\", \"Conditions\":\"<script>window.location = 'http://www.google.com'</script>\" }")
+	case 5:
+		res.Header().Set("Content-Type", "application/json")
+		response, _ := json.Marshal(getWeather())
+		time.Sleep(300 * time.Second)
+		fmt.Fprintln(res, string(response))
 	}
 
 }
