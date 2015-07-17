@@ -50,7 +50,7 @@ func getWeather() Weather {
 
 func generateRes(res http.ResponseWriter) {
 	// Randomly give back a good response or random garbage :)
-	dice := rand.Intn(10)
+	dice := rand.Intn(20)
 
 	switch dice {
 	default:
